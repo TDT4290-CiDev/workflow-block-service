@@ -1,2 +1,2 @@
 # Always use LF line endings for shell scripts
-*.sln text eol=lf
+*.sh text eol=lf
