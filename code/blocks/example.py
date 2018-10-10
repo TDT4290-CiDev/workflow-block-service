@@ -3,7 +3,30 @@
 class Example:
 
     def get_info(self):
-        pass
+        return {
+            'description': 'An example block used for documentation.',
+            'params': {
+                'param1': {
+                    'type': 'string',
+                    'description': 'The first parameter.'
+                },
+                'param2': {
+                    'type': 'integer',
+                    'description': 'The second parameter.'
+                }
+            },
+            'outputs': {
+                'output1': {
+                    'type': 'float',
+                    'description': 'The first output.'
+                },
+                'output2': {
+                    'type': 'boolean',
+                    'description': 'The second output.'
+                }
+            },
+            'can_suspend_execution': False
+        }
 
     def execute(self, params):
         pass
