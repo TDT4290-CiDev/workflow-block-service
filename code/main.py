@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import jsonify
+from flask import Flask, jsonify
 import block_manager
 
 app = Flask(__name__)
@@ -28,7 +27,12 @@ def get_block_info(block_name):
     """
     Returns info about block, including description, input parameters, and output.
     """
-    pass
+    try:
+        block = block_manager.blocks[block_name]
+    except KeyError:
+        return 404, 'No block with that name exists.'
+
+    return jsonify(block.get_info())
 
 
 # Only for testing purposes - should use WSGI server in production
