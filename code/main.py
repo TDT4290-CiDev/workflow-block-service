@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import block_manager
 
 app = Flask(__name__)
@@ -30,9 +30,30 @@ def get_block_info(block_name):
     try:
         block = block_manager.blocks[block_name]
     except KeyError:
-        return 404, 'No block with that name exists.'
+        return 'No block with that name exists.', 404
 
     return jsonify(block.get_info())
+
+
+@app.route('/<block_name>', methods=['POST'])
+def execute_block(block_name):
+    body = request.get_json()
+
+    try:
+        block = block_manager.blocks[block_name]
+    except KeyError:
+        return 'No block with that name exists.', 404
+
+    for name, param in block.get_info()['params'].items():
+        if name not in body['params']:
+            return 'Missing parameter ' + name + ".", 400
+
+        if type(body['params'][name]) != block_manager.type_map[param['type']]:
+            return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", 400
+
+    result = block.execute(body['params'])
+
+    return jsonify(result)
 
 
 # Only for testing purposes - should use WSGI server in production

@@ -17,11 +17,11 @@ class Example:
             },
             'outputs': {
                 'output1': {
-                    'type': 'float',
+                    'type': 'string',
                     'description': 'The first output.'
                 },
                 'output2': {
-                    'type': 'boolean',
+                    'type': 'string',
                     'description': 'The second output.'
                 }
             },
@@ -29,4 +29,7 @@ class Example:
         }
 
     def execute(self, params):
-        pass
+        return {
+            'output1': 'Hello',
+            'output2': 'world!'
+        }
