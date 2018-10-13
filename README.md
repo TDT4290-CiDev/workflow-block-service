@@ -16,7 +16,7 @@ Note the dot at the end: this notifies docker that the Dockerfile at the current
 
 * Run the app using the normal Run and Debug buttons in PyCharm!
 
-* Send requests by navigating to localhost:8080/<...> in ypur favorite browser or with curl.
+* Send requests by navigating to localhost:8080/<...> in your favorite browser or with curl.
 
 * Send POST requests using curl:
 ```bash
