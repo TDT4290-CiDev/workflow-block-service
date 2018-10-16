@@ -29,7 +29,10 @@ curl -H "Content-type: application/json" \
 Blocks are implemented as classes with the following structure:
 
 ```python
-class MyWorkflowBlock:
+from blocks.block import WorkflowBlock
+
+
+class MyWorkflowBlock(WorkflowBlock):
     
     def get_info(self):
         """
