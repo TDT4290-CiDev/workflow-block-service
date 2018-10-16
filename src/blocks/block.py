@@ -22,3 +22,11 @@ class WorkflowBlock:
         """
 
         return state, 'suspend'
+
+    def resume(self, state, params):
+        """
+        Resumes execution of a suspended block.
+        :param state: The state dictionary returned by the block upon suspension.
+        :param params: Any new parameters given upon resumption.
+        """
+        pass
