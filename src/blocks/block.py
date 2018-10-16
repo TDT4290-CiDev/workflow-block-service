@@ -13,3 +13,12 @@ class WorkflowBlock:
         Implements the functionality of the block. Called by the server upon requests to the block's endpoint.
         """
         pass
+
+    def suspend(self, state):
+        """
+        Creates a suspend response, signalling that the block will wait for further input before resuming.
+        :param state: A dictionary containing all information the block will need to resume execution when called again.
+        :return: A tuple (state, status), where status will be 'suspend', to signal that the block is suspending.
+        """
+
+        return state, 'suspend'
