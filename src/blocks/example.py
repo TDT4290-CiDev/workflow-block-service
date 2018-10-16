@@ -1,6 +1,7 @@
+from blocks.block import WorkflowBlock
 
 
-class Example:
+class Example(WorkflowBlock):
 
     def get_info(self):
         return {
