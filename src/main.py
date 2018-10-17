@@ -16,7 +16,12 @@ def discovery():
         info = block.get_info()
         result['blocks'].append({
             'name': name,
-            'description': info['description']
+            'description': info['description'],
+            'links': {
+                'root': request.script_root + '/' + name,
+                'info': request.script_root + '/' + name + '/info',
+                'resume': request.script_root + '/' + name + '/resume',
+            }
         })
 
     return jsonify(result)
