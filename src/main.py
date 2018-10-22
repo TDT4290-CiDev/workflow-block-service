@@ -41,8 +41,10 @@ def get_block_info(block_name):
 
 
 @app.route('/<block_name>', methods=['POST'])
+@app.route('/<block_name>/resume', methods=['POST'])
 def execute_block(block_name):
     body = request.get_json()
+    is_resuming = request.path.endswith('/resume')
 
     try:
         block = block_manager.blocks[block_name]
@@ -61,7 +63,12 @@ def execute_block(block_name):
 
         cleaned_params[name] = body['params'][name]
 
-    result = block.execute(cleaned_params)
+    if is_resuming:
+        # TODO State validation?
+        result = block.resume(body['state'], cleaned_params)
+    else:
+        result = block.execute(cleaned_params)
+
 
     if type(result) == dict:
         response = {

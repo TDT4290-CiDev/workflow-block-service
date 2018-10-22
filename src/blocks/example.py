@@ -30,6 +30,17 @@ class Example(WorkflowBlock):
         }
 
     def execute(self, params):
+        if params['param1'] == 'suspend':
+            return self.suspend({'params': params, 'suspend_count': 1})
+
+        return {
+            'output1': 'Hello',
+            'output2': 'world!'
+        }
+
+    def resume(self, state, params):
+        suspend_count = state['suspend_count'] + 1
+
         return {
             'output1': 'Hello',
             'output2': 'world!'
