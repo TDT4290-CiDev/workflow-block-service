@@ -99,7 +99,9 @@ This is done by returning the result of the `suspend` method (inherited from `Wo
 passed to the method when suspending. This dictionary should include all parameters need to resume execution,
 including information about at what point the execution was suspended, and any parameters originally passed passed to 
 the `execute` function that are required upon resuming. This could be as simple as passing the original `params`
-dictionary, or more complex.
+dictionary, or more complex. If additional parameters should be provided by the user upon resuming execution, these
+should be requested by passing a dictionary as the `requested_params` argument. This has the same format as the `params`
+item in the block information dictionary.
 
 Upon resumption, the resume method of the block will be called. This method takes two parameters: `state`, which is the
 same dictionary as given to the `suspend` method, and `params`, which contains any new parameters. The `resume` method
@@ -111,7 +113,13 @@ example.
 def execute(self, params):
     # ... Initial code here ...
     if need_additional_data:
-        return self.suspend(params)
+        requested_params = {
+            'new_param': {
+                'type': 'string',
+                'description': 'A new parameter that we did not originally request.'
+            }
+        }
+        return self.suspend(params, requested_params)
     return result
 
 def resume(self, state, params):
