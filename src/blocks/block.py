@@ -14,13 +14,15 @@ class WorkflowBlock:
         """
         pass
 
-    def suspend(self, state):
+    def suspend(self, state, requested_params={}):
         """
         Creates a suspend response, signalling that the block will wait for further input before resuming.
         :param state: A dictionary containing all information the block will need to resume execution when called again.
+        :param requested_params: A dictionary containing parameters that should be provided by the user upon
+                                resuming execution. Given in same format as in get_info.
         :return: A tuple (state, status), where status will be 'suspend', to signal that the block is suspending.
         """
-
+        state['requested_params'] = requested_params
         return state, 'suspend'
 
     def resume(self, state, params):

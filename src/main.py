@@ -51,10 +51,19 @@ def execute_block(block_name):
     except KeyError:
         return 'No block with that name exists.', 404
 
+    if is_resuming and 'state' not in body:
+        return 'State must be provided when resuming', 400
+
     # Create new dictionary that will only contain parameters included in block specification
     cleaned_params = {}
 
-    for name, param in block.get_info()['params'].items():
+    requested_params = {}
+    if is_resuming and 'requested_params' in body['state']:
+        requested_params = body['state']['requested_params']
+    else:
+        requested_params = block.get_info()['params']
+
+    for name, param in requested_params.items():
         if name not in body['params']:
             return 'Missing parameter ' + name + ".", 400
 
@@ -64,11 +73,9 @@ def execute_block(block_name):
         cleaned_params[name] = body['params'][name]
 
     if is_resuming:
-        # TODO State validation?
         result = block.resume(body['state'], cleaned_params)
     else:
         result = block.execute(cleaned_params)
-
 
     if type(result) == dict:
         response = {
