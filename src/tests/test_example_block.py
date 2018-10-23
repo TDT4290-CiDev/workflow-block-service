@@ -74,3 +74,8 @@ class ExampleTests(unittest.TestCase):
         self.assertEqual(resume_response.status_code, 200)
         print(resume_response.data)
 
+    def test_execute_fails_when_suspended(self):
+        suspend_response = self.execute_example('suspend', 1)
+        execute_response = self.execute_example('test_restart', 1)
+        self.assertEqual(execute_response.status_code, 400)
+
