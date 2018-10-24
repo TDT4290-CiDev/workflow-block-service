@@ -1,8 +1,7 @@
 import unittest
-import copy
 
-from src import block_manager
-from src.main import app
+import block_manager
+from main import app
 
 example_input = {'params': {'param1': 'test', 'param2': 1}}
 example_suspend = {'params': {'param1': 'suspend', 'param2': 1}}
@@ -72,10 +71,4 @@ class ExampleTests(unittest.TestCase):
         data['params'] = {'param1': 'test_resume'}
         resume_response = self.app.post('/example/resume', json=data)
         self.assertEqual(resume_response.status_code, 200)
-        print(resume_response.data)
-
-    def test_execute_fails_when_suspended(self):
-        suspend_response = self.execute_example('suspend', 1)
-        execute_response = self.execute_example('test_restart', 1)
-        self.assertEqual(execute_response.status_code, 400)
 
