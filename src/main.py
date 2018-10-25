@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from http import HTTPStatus
 import block_manager
 
 app = Flask(__name__)
@@ -35,7 +36,7 @@ def get_block_info(block_name):
     try:
         block = block_manager.blocks[block_name]
     except KeyError:
-        return 'No block with that name exists.', 404
+        return 'No block with that name exists.', HTTPStatus.NOT_FOUND
 
     return jsonify(block.get_info())
 
@@ -49,10 +50,10 @@ def execute_block(block_name):
     try:
         block = block_manager.blocks[block_name]
     except KeyError:
-        return 'No block with that name exists.', 404
+        return 'No block with that name exists.', HTTPStatus.NOT_FOUND
 
     if is_resuming and 'state' not in body:
-        return 'State must be provided when resuming', 400
+        return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
 
     # Create new dictionary that will only contain parameters included in block specification
     cleaned_params = {}
@@ -65,10 +66,10 @@ def execute_block(block_name):
 
     for name, param in requested_params.items():
         if name not in body['params']:
-            return 'Missing parameter ' + name + ".", 400
+            return 'Missing parameter ' + name + ".", HTTPStatus.BAD_REQUEST
 
         if type(body['params'][name]) != block_manager.type_map[param['type']]:
-            return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", 400
+            return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", HTTPStatus.BAD_REQUEST
 
         cleaned_params[name] = body['params'][name]
 
@@ -90,7 +91,7 @@ def execute_block(block_name):
                 'state': result[0]
             }
     else:
-        return 'Workflow block returned invalid data.', 500
+        return 'Workflow block returned invalid data.', HTTPStatus.INTERNAL_SERVER_ERROR
 
     return jsonify(response)
 
