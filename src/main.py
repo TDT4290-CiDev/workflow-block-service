@@ -41,24 +41,58 @@ def get_block_info(block_name):
 
 
 @app.route('/<block_name>', methods=['POST'])
+@app.route('/<block_name>/resume', methods=['POST'])
 def execute_block(block_name):
     body = request.get_json()
+    is_resuming = request.path.endswith('/resume')
 
     try:
         block = block_manager.blocks[block_name]
     except KeyError:
         return 'No block with that name exists.', 404
 
-    for name, param in block.get_info()['params'].items():
+    if is_resuming and 'state' not in body:
+        return 'State must be provided when resuming', 400
+
+    # Create new dictionary that will only contain parameters included in block specification
+    cleaned_params = {}
+
+    requested_params = {}
+    if is_resuming and 'requested_params' in body['state']:
+        requested_params = body['state']['requested_params']
+    else:
+        requested_params = block.get_info()['params']
+
+    for name, param in requested_params.items():
         if name not in body['params']:
             return 'Missing parameter ' + name + ".", 400
 
         if type(body['params'][name]) != block_manager.type_map[param['type']]:
             return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", 400
 
-    result = block.execute(body['params'])
+        cleaned_params[name] = body['params'][name]
 
-    return jsonify(result)
+    if is_resuming:
+        result = block.resume(body['state'], cleaned_params)
+    else:
+        result = block.execute(cleaned_params)
+
+    if type(result) == dict:
+        response = {
+            'type': 'result',
+            'data': result
+        }
+    elif type(result) == tuple:
+        status = result[1]
+        if status == 'suspend':
+            response = {
+                'type': 'suspend',
+                'state': result[0]
+            }
+    else:
+        return 'Workflow block returned invalid data.', 500
+
+    return jsonify(response)
 
 
 # Only for testing purposes - should use WSGI server in production

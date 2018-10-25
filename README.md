@@ -29,7 +29,10 @@ curl -H "Content-type: application/json" \
 Blocks are implemented as classes with the following structure:
 
 ```python
-class MyWorkflowBlock:
+from blocks.block import WorkflowBlock
+
+
+class MyWorkflowBlock(WorkflowBlock):
     
     def get_info(self):
         """
@@ -40,6 +43,14 @@ class MyWorkflowBlock:
     def execute(self, params):
         """
         Implements the functionality of the block. Called by the server upon requests to the block's endpoint.
+        """
+        pass
+    
+    def resume(self, state, params):
+        """
+        Resumes execution of a suspended block.
+        :param state: The state dictionary returned by the block upon suspension.
+        :param params: Any new parameters given upon resumption.
         """
         pass
 ```
@@ -81,3 +92,37 @@ The `execute` method implements the functionality of the blocks; possibly with t
 `params` will be passed as a dictionary containing the parameter values provided by the user. All values specified in
 the info dictionary can be assumed to be present, and with the correct type, as this is checked by the server.
 The method must return a dictionary containing the output values specified by the info dictionary.
+
+## Suspending execution
+Sometimes, a workflow block may need to suspend execution in order to wait for user input or another external event.
+This is done by returning the result of the `suspend` method (inherited from `WorkflowBlock`). A state dictionary must 
+passed to the method when suspending. This dictionary should include all parameters need to resume execution,
+including information about at what point the execution was suspended, and any parameters originally passed passed to 
+the `execute` function that are required upon resuming. This could be as simple as passing the original `params`
+dictionary, or more complex. If additional parameters should be provided by the user upon resuming execution, these
+should be requested by passing a dictionary as the `requested_params` argument. This has the same format as the `params`
+item in the block information dictionary.
+
+Upon resumption, the resume method of the block will be called. This method takes two parameters: `state`, which is the
+same dictionary as given to the `suspend` method, and `params`, which contains any new parameters. The `resume` method
+can itself suspend execution, in which case `state` must contain any info required to distinguish between different
+suspensions. The returned result should be equivalent to the one usually returned by execute. See below for a simple
+example. 
+
+```python
+def execute(self, params):
+    # ... Initial code here ...
+    if need_additional_data:
+        requested_params = {
+            'new_param': {
+                'type': 'string',
+                'description': 'A new parameter that we did not originally request.'
+            }
+        }
+        return self.suspend(params, requested_params)
+    return result
+
+def resume(self, state, params):
+    # ... Resume execution ....
+    return result
+```
