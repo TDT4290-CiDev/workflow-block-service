@@ -7,7 +7,7 @@ class SendMail(WorkflowBlock):
 
     def get_info(self):
         return {
-            'description': 'A block used for sending an email',
+            'description': 'Send an email.',
             'params': {
                 'from': {
                     'type': 'string',
@@ -29,7 +29,7 @@ class SendMail(WorkflowBlock):
             'outputs': {
                 'email_sent': {
                     'type': 'boolean',
-                    'description': 'True if sent, False isf something went wrong.'
+                    'description': 'True if sent, False if something went wrong.'
                 }
             },
             'can_suspend_execution': False
@@ -50,6 +50,3 @@ class SendMail(WorkflowBlock):
         #TODO::Fix error handling to better know what went wrong
         except:
             return {'email_sent': False}
-
-    def resume(self, state, params):
-        pass
