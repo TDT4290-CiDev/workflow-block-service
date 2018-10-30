@@ -4,7 +4,7 @@
 NOTE: Make sure you are using PyCharm 2017 Professional Edition
 * Build the docker image using 
 ```bash
-docker image -t <your-image-name> .
+docker build -t <your-image-name> .
 ```
 Note the dot at the end: this notifies docker that the Dockerfile at the current directory should be used to build the image.
 
