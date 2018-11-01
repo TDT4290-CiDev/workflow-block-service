@@ -23,8 +23,8 @@ class SendMail(WorkflowBlock):
                     'description': 'Address the email is sent from.'
                 },
                 'to': {
-                    'type': 'string',
-                    'description': 'Address to send email to.'
+                    'type': 'list',
+                    'description': 'Addresses to send email to.'
                 },
                 'subject': {
                     'type': 'string',
