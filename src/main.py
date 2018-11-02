@@ -5,7 +5,7 @@ import block_manager
 app = Flask(__name__)
 
 
-@app.route('/discovery', methods=['GET'])
+@app.route('/discovery/', methods=['GET'])
 def discovery():
     """
     Returns a list of all registered blocks.
@@ -28,7 +28,7 @@ def discovery():
     return jsonify(result)
 
 
-@app.route('/<block_name>/info', methods=['GET'])
+@app.route('/<block_name>/info/', methods=['GET'])
 def get_block_info(block_name):
     """
     Returns info about block, including description, input parameters, and output.
@@ -41,11 +41,11 @@ def get_block_info(block_name):
     return jsonify(block.get_info())
 
 
-@app.route('/<block_name>', methods=['POST'])
-@app.route('/<block_name>/resume', methods=['POST'])
+@app.route('/<block_name>', methods=['POST'], strict_slashes=False)
+@app.route('/<block_name>/resume', methods=['POST'], strict_slashes=False)
 def execute_block(block_name):
     body = request.get_json()
-    is_resuming = request.path.endswith('/resume')
+    is_resuming = request.path.endswith(('/resume', '/resume/'))
 
     try:
         block = block_manager.blocks[block_name]
