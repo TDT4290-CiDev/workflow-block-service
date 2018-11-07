@@ -1,7 +1,9 @@
 from blocks.example import Example
+from blocks.send_mail import SendMail
 
 blocks = {
-    'example': Example()
+    'example': Example(),
+    'send_mail': SendMail()
 }
 
 type_map = {
@@ -12,5 +14,6 @@ type_map = {
     'integer': int,
     'int': int,
     'boolean': bool,
-    'bool': bool
+    'bool': bool,
+    'list': list
 }
