@@ -75,13 +75,13 @@ def execute_block(block_name):
 
         cleaned_params[name] = body['params'][name]
 
-    if is_resuming:
-        result = block.resume(body['state'], cleaned_params)
-    else:
-        try:
+    try:
+        if is_resuming:
+            result = block.resume(body['state'], cleaned_params)
+        else:
             result = block.execute(cleaned_params)
-        except BlockError as e:
-            return str(e), HTTPStatus.INTERNAL_SERVER_ERROR
+    except BlockError as e:
+        return str(e), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
     if type(result) == dict:
