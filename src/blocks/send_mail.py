@@ -1,6 +1,7 @@
-from blocks.block import WorkflowBlock
 import smtplib
 
+from blocks.block import WorkflowBlock
+from block_exception import BlockError
 from email.message import EmailMessage
 
 server_name = 'smtp.stud.ntnu.no'
@@ -46,12 +47,13 @@ class SendMail(WorkflowBlock):
 
     def execute(self, params):
         msg = EmailMessage()
-        msg['Subject'] = params['subject']
-        msg['From'] = params['from']
-        msg['To'] = params['to']
-        msg.set_content(params['message'])
-
-        # Switch to appropriate mail server address.
+        try:
+            msg['Subject'] = params['subject']
+            msg['From'] = params['from']
+            msg['To'] = params['to']
+            msg.set_content(params['message'])
+        except KeyError as e:
+            raise BlockError(str(e))
         try:
             with smtplib.SMTP(server_name, server_port) as smtp:
                 smtp.ehlo()
@@ -59,12 +61,9 @@ class SendMail(WorkflowBlock):
                 smtp.login(username, password)
                 smtp.send_message(msg)
             return {'email_sent': True}
-        # TODO::Fix error handling to better know what went wrong
-        except smtplib.SMTPConnectError as connect_e:
-            print('Unable to connect to SMTP server.\n' + connect_e.message())
-            return {'email_sent': False}
-        except smtplib.SMTPAuthenticationError as auth_e:
-            print('Username and password not accepted.\n' + auth_e.message())
-            return {'email_sent': False}
-        except smtplib.SMPTException as e:
-            print('An error occured: ' + e.message())
+        except smtplib.SMTPConnectError:
+            raise BlockError("Unable to connect to the SMTP server {}".format(server_name))
+        except smtplib.SMTPAuthenticationError:
+            raise BlockError('Username and password not accepted to {}'.format(server_name))
+        except smtplib.SMPTException:
+            raise BlockError('An error occured while connecting to the SMTP server {}'.format(server_name))

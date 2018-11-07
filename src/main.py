@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
+
+from block_exception import BlockError
 import block_manager
 
 app = Flask(__name__)
@@ -76,7 +78,11 @@ def execute_block(block_name):
     if is_resuming:
         result = block.resume(body['state'], cleaned_params)
     else:
-        result = block.execute(cleaned_params)
+        try:
+            result = block.execute(cleaned_params)
+        except BlockError as e:
+            return str(e), HTTPStatus.INTERNAL_SERVER_ERROR
+
 
     if type(result) == dict:
         response = {
@@ -98,4 +104,4 @@ def execute_block(block_name):
 
 # Only for testing purposes - should use WSGI server in production
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, host='0.0.0.0', port=8080)
