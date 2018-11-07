@@ -65,5 +65,5 @@ class SendMail(WorkflowBlock):
             raise BlockError("Unable to connect to the SMTP server {}".format(server_name))
         except smtplib.SMTPAuthenticationError:
             raise BlockError('Username and password not accepted to {}'.format(server_name))
-        except smtplib.SMPTException:
+        except smtplib.SMTPException:
             raise BlockError('An error occured while connecting to the SMTP server {}'.format(server_name))
