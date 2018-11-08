@@ -1,3 +1,4 @@
+import os
 import smtplib
 
 from blocks.block import WorkflowBlock
@@ -7,11 +8,9 @@ from email.message import EmailMessage
 server_name = 'smtp.stud.ntnu.no'
 server_port = '587'
 
-with open('mail_user.txt') as usr:
-    username = usr.read()
+username = os.environ.get('BLOCK_MAIL_USER', '')
+password = os.environ.get('BLOCK_MAIL_PASS', '')
 
-with open('mail_pass.txt') as pw:
-    password = pw.read()
 
 class SendMail(WorkflowBlock):
 
