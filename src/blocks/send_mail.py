@@ -11,7 +11,6 @@ server_port = '587'
 username = os.environ.get('BLOCK_MAIL_USER', '')
 password = os.environ.get('BLOCK_MAIL_PASS', '')
 
-
 class SendMail(WorkflowBlock):
 
     def get_info(self):
