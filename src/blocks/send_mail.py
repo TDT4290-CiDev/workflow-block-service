@@ -8,8 +8,8 @@ from email.message import EmailMessage
 server_name = 'smtp.stud.ntnu.no'
 server_port = '587'
 
-username = os.environ.get('CIDEV_MAIL_USER', '')
-password = os.environ.get('CIDEV_MAIL_PASS', '')
+username = os.environ.get('BLOCK_MAIL_USER', '')
+password = os.environ.get('BLOCK_MAIL_PASS', '')
 
 
 class SendMail(WorkflowBlock):
