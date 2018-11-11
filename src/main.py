@@ -49,6 +49,9 @@ def execute_block(block_name):
     body = request.get_json()
     is_resuming = request.path.endswith(('/resume', '/resume/'))
 
+    if body is None:
+        return 'Body must be a JSON object', HTTPStatus.BAD_REQUEST
+
     try:
         block = block_manager.blocks[block_name]
     except KeyError:
