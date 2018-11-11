@@ -69,6 +69,9 @@ def execute_block(block_name):
     else:
         requested_params = block.get_info()['params']
 
+    if 'params' not in body and len(requested_params):
+        return 'No parameters sent', HTTPStatus.BAD_REQUEST
+
     for name, param in requested_params.items():
         if name not in body['params']:
             return 'Missing parameter ' + name + ".", HTTPStatus.BAD_REQUEST
