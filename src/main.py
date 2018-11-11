@@ -63,11 +63,12 @@ def execute_block(block_name):
     # Create new dictionary that will only contain parameters included in block specification
     cleaned_params = dict()
 
-    requested_params = None
     if is_resuming and 'requested_params' in body['state']:
         requested_params = body['state']['requested_params']
-    else:
+    elif not is_resuming:
         requested_params = block.get_info()['params']
+    else:
+        requested_params = dict()
 
     if 'params' not in body and len(requested_params):
         return 'No parameters sent', HTTPStatus.BAD_REQUEST
