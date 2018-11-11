@@ -12,7 +12,7 @@ def discovery():
     """
     Returns a list of all registered blocks.
     """
-    result = {}
+    result = dict()
     result['blocks'] = []
 
     for name, block in block_manager.blocks.items():
@@ -58,9 +58,9 @@ def execute_block(block_name):
         return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
 
     # Create new dictionary that will only contain parameters included in block specification
-    cleaned_params = {}
+    cleaned_params = dict()
 
-    requested_params = {}
+    requested_params = None
     if is_resuming and 'requested_params' in body['state']:
         requested_params = body['state']['requested_params']
     else:
@@ -82,7 +82,6 @@ def execute_block(block_name):
             result = block.execute(cleaned_params)
     except BlockError as e:
         return str(e), HTTPStatus.INTERNAL_SERVER_ERROR
-
 
     if type(result) == dict:
         response = {
