@@ -60,14 +60,14 @@ def clean_params(block, request_body, is_resuming):
     requested_params = get_requested_params(block, request_body, is_resuming)
 
     if 'params' not in request_body and len(requested_params):
-        return 'No parameters sent', HTTPStatus.BAD_REQUEST
+        raise ValueError("No parameters sent.")
 
     for name, param in requested_params.items():
         if name not in request_body['params']:
-            return 'Missing parameter ' + name + ".", HTTPStatus.BAD_REQUEST
+            raise ValueError(f"Missing parameter {name}.")
 
         if type(request_body['params'][name]) != block_manager.type_map[param['type']]:
-            return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", HTTPStatus.BAD_REQUEST
+            raise ValueError('Invalid type for parameter ' + name + "; expected " + param['type'] + ".")
 
         cleaned_params[name] = request_body['params'][name]
 
@@ -91,7 +91,10 @@ def execute_block(block_name):
     if is_resuming and 'state' not in request_body:
         return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
 
-    cleaned_params = clean_params(block, request_body, is_resuming)
+    try:
+        cleaned_params = clean_params(block, request_body, is_resuming)
+    except ValueError as e:
+        return str(e), HTTPStatus.BAD_REQUEST
 
     try:
         if is_resuming:
