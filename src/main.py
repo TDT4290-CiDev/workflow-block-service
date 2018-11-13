@@ -82,9 +82,6 @@ def execute_block(block_name):
 
         cleaned_params[name] = body['params'][name]
 
-    if is_resuming and 'state' not in body:
-        return 'State must be sent when resuming', HTTPStatus.BAD_REQUEST
-
     try:
         if is_resuming:
             result = block.resume(body['state'], cleaned_params)
