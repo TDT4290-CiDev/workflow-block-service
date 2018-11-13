@@ -43,9 +43,9 @@ def get_block_info(block_name):
     return jsonify(block.get_info())
 
 
-def get_requested_params(block, body, is_resuming):
-    if is_resuming and 'requested_params' in body['state']:
-        requested_params = body['state']['requested_params']
+def get_requested_params(block, request_body, is_resuming):
+    if is_resuming and 'requested_params' in request_body['state']:
+        requested_params = request_body['state']['requested_params']
     elif not is_resuming:
         requested_params = block.get_info()['params']
     else:
@@ -53,23 +53,23 @@ def get_requested_params(block, body, is_resuming):
     return requested_params
 
 
-def clean_params(block, body, is_resuming):
+def clean_params(block, request_body, is_resuming):
     # Create new dictionary that will only contain parameters included in block specification
     cleaned_params = dict()
 
-    requested_params = get_requested_params(block, body, is_resuming)
+    requested_params = get_requested_params(block, request_body, is_resuming)
 
-    if 'params' not in body and len(requested_params):
+    if 'params' not in request_body and len(requested_params):
         return 'No parameters sent', HTTPStatus.BAD_REQUEST
 
     for name, param in requested_params.items():
-        if name not in body['params']:
+        if name not in request_body['params']:
             return 'Missing parameter ' + name + ".", HTTPStatus.BAD_REQUEST
 
-        if type(body['params'][name]) != block_manager.type_map[param['type']]:
+        if type(request_body['params'][name]) != block_manager.type_map[param['type']]:
             return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", HTTPStatus.BAD_REQUEST
 
-        cleaned_params[name] = body['params'][name]
+        cleaned_params[name] = request_body['params'][name]
 
     return cleaned_params
 
@@ -77,10 +77,10 @@ def clean_params(block, body, is_resuming):
 @app.route('/<block_name>', methods=['POST'], strict_slashes=False)
 @app.route('/<block_name>/resume', methods=['POST'], strict_slashes=False)
 def execute_block(block_name):
-    body = request.get_json()
+    request_body = request.get_json()
     is_resuming = request.path.endswith(('/resume', '/resume/'))
 
-    if body is None:
+    if request_body is None:
         return 'Body must be a JSON object', HTTPStatus.BAD_REQUEST
 
     try:
@@ -88,14 +88,14 @@ def execute_block(block_name):
     except KeyError:
         return 'No block with that name exists.', HTTPStatus.NOT_FOUND
 
-    if is_resuming and 'state' not in body:
+    if is_resuming and 'state' not in request_body:
         return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
 
-    cleaned_params = clean_params(block, body, is_resuming)
+    cleaned_params = clean_params(block, request_body, is_resuming)
 
     try:
         if is_resuming:
-            result = block.resume(body['state'], cleaned_params)
+            result = block.resume(request_body['state'], cleaned_params)
         else:
             result = block.execute(cleaned_params)
     except BlockError as e:
