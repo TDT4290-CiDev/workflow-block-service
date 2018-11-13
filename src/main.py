@@ -43,23 +43,7 @@ def get_block_info(block_name):
     return jsonify(block.get_info())
 
 
-@app.route('/<block_name>', methods=['POST'], strict_slashes=False)
-@app.route('/<block_name>/resume', methods=['POST'], strict_slashes=False)
-def execute_block(block_name):
-    body = request.get_json()
-    is_resuming = request.path.endswith(('/resume', '/resume/'))
-
-    if body is None:
-        return 'Body must be a JSON object', HTTPStatus.BAD_REQUEST
-
-    try:
-        block = block_manager.blocks[block_name]
-    except KeyError:
-        return 'No block with that name exists.', HTTPStatus.NOT_FOUND
-
-    if is_resuming and 'state' not in body:
-        return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
-
+def clean_params(block, body, is_resuming):
     # Create new dictionary that will only contain parameters included in block specification
     cleaned_params = dict()
 
@@ -81,6 +65,28 @@ def execute_block(block_name):
             return 'Invalid type for parameter ' + name + "; expected " + param['type'] + ".", HTTPStatus.BAD_REQUEST
 
         cleaned_params[name] = body['params'][name]
+
+    return cleaned_params
+
+
+@app.route('/<block_name>', methods=['POST'], strict_slashes=False)
+@app.route('/<block_name>/resume', methods=['POST'], strict_slashes=False)
+def execute_block(block_name):
+    body = request.get_json()
+    is_resuming = request.path.endswith(('/resume', '/resume/'))
+
+    if body is None:
+        return 'Body must be a JSON object', HTTPStatus.BAD_REQUEST
+
+    try:
+        block = block_manager.blocks[block_name]
+    except KeyError:
+        return 'No block with that name exists.', HTTPStatus.NOT_FOUND
+
+    if is_resuming and 'state' not in body:
+        return 'State must be provided when resuming', HTTPStatus.BAD_REQUEST
+
+    cleaned_params = clean_params(block, body, is_resuming)
 
     try:
         if is_resuming:
