@@ -43,16 +43,21 @@ def get_block_info(block_name):
     return jsonify(block.get_info())
 
 
-def clean_params(block, body, is_resuming):
-    # Create new dictionary that will only contain parameters included in block specification
-    cleaned_params = dict()
-
+def get_requested_params(block, body, is_resuming):
     if is_resuming and 'requested_params' in body['state']:
         requested_params = body['state']['requested_params']
     elif not is_resuming:
         requested_params = block.get_info()['params']
     else:
         requested_params = dict()
+    return requested_params
+
+
+def clean_params(block, body, is_resuming):
+    # Create new dictionary that will only contain parameters included in block specification
+    cleaned_params = dict()
+
+    requested_params = get_requested_params(block, body, is_resuming)
 
     if 'params' not in body and len(requested_params):
         return 'No parameters sent', HTTPStatus.BAD_REQUEST
