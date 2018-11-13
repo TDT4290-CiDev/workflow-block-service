@@ -17,5 +17,4 @@ type_map = {
     'int': int,
     'boolean': bool,
     'bool': bool,
-    'list': list
 }

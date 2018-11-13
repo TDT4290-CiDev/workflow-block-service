@@ -23,8 +23,8 @@ class SendMail(WorkflowBlock):
                     'description': 'Address the email is sent from.'
                 },
                 'to': {
-                    'type': 'list',
-                    'description': 'Addresses to send email to.'
+                    'type': 'string',
+                    'description': 'Addresses to send email to. Multiple addresses can be separated by comma.'
                 },
                 'subject': {
                     'type': 'string',
@@ -49,7 +49,7 @@ class SendMail(WorkflowBlock):
         try:
             msg['Subject'] = params['subject']
             msg['From'] = params['from']
-            msg['To'] = params['to']
+            msg['To'] = params['to'].split(',')
             msg.set_content(params['message'])
         except KeyError as e:
             raise BlockError(str(e))
