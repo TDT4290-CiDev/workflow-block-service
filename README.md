@@ -126,3 +126,24 @@ def resume(self, state, params):
     # ... Resume execution ....
     return result
 ```
+
+## Executing a block
+To execute a certain block, a request must be POSTed to `/<block_name>/` (`/` being the root of this service).
+The body should be an `application/json` object with a single required field: `params`. For example, the following
+request will execute the example block described above:
+
+```HTTP
+POST /example/ HTTP/1.1
+Host: localhost
+Content-Type: application/json
+cache-control: no-cache
+{
+	"params": {
+		"param1": "example",
+		"param2": 1
+	}
+}
+```
+
+When resuming after suspension, the request should be sent to `/<block_name>/resume/`, and the additional field `state`
+must be provided. This should be the exact same object that the block returned when suspending.
